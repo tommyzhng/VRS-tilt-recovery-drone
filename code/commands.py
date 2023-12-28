@@ -57,6 +57,30 @@ def send_acceleration(vehicle, a):
         0, 0)
     vehicle.mav.send(msg) 
 
+def send_velocity(vehicle, v):
+    msg = mavutil.mavlink.MAVLink_set_position_target_local_ned_message(
+        0,
+        0, 0,
+        mavutil.mavlink.MAV_FRAME_LOCAL_NED,
+        0b110111000111,
+        0, 0, 0,
+        0, 0, v,
+        0, 0, 0,
+        0, 0)
+    vehicle.mav.send(msg)
+
+def send_position(vehicle, x, y, z):
+    msg = mavutil.mavlink.MAVLink_set_position_target_local_ned_message(
+        0,
+        0, 0,
+        mavutil.mavlink.MAV_FRAME_LOCAL_NED,
+        0b110111111000,
+        x, y, -z,
+        0, 0, 0,
+        0, 0, 0,
+        0, 0)
+    vehicle.mav.send(msg)
+
 
 def yaw_instruction(vehicle):
     if vehicle.location.global_relative_frame.alt < 10:
