@@ -8,7 +8,7 @@ __pycache__/
 build/
 devel/
 logs/
-
+.catkin_tools/
 
 # C extensions
 *.so
