@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# for ansys
+
+VRS_nonvectored/
+VRS_vectored/
+
+
 # for ROS
 
 build/
