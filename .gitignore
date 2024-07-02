@@ -4,17 +4,29 @@ __pycache__/
 *$py.class
 
 # for ansys
-
 VRS_nonvectored/
 VRS_vectored/
 
 
 # for ROS
-
 build/
 devel/
 logs/
 .catkin_tools/
+
+# MATLAB
+*.asv
+*.m~
+*.mex*
+*.mlappinstall
+*.mltbx
+helpsearch*/
+slprj/
+sccprj/
+codegen/
+*.autosave
+*.slxc
+octave-workspace
 
 # C extensions
 *.so
