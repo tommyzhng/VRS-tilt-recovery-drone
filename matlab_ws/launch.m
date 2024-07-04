@@ -8,6 +8,7 @@ Arm = [
 ];
 prop_inertia = (1/12) * 0.015 * 0.127^2;
 tilt_speed = [0; pi/4; 0];
+sample_time = 0.01;
 
 %% environmental variables
 g = 9.81;
