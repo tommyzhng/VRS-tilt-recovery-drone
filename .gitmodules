@@ -1,0 +1,3 @@
+[submodule "matlab_ws/PX4-Toolbox-SITL-SFunction"]
+	path = matlab_ws/PX4-Toolbox-SITL-SFunction
+	url = https://github.com/tommyzhng/PX4-Toolbox-SITL-SFunction
