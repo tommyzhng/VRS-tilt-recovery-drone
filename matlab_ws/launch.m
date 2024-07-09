@@ -7,18 +7,18 @@ R = 0.127;
 CDval = 0.008;
 CDDrone = 1.6e-7;
 Arm = [
-0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2)) -0.2*(1/sqrt(2))
-0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2))
+0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2)) -0.15*(1/sqrt(2))
+0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.15*(1/sqrt(2))
 0 0 0 0
 ];
-Ixx = 0.005; %Kgm^2
-Iyy = 0.005;
-Izz = 0.009;
+Ixx = 0.0126; %Kgm^2
+Iyy = 0.0126;
+Izz = 0.0253;
 
 inertia = diag([Ixx, Iyy, Izz]);
 
 rotorRPMMax = 10000;
-rotorTimeConst = 0.25;
+rotorTimeConst = 0.05;
 prop_inertia = (1/12) * 0.015 * 0.127^2;
 tilt_speed = [0; pi/4; 0];
 
