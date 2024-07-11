@@ -7,8 +7,8 @@ R = 0.127;
 CDval = 0.008;
 CDDrone = 1.6e-7;
 Arm = [
-0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2)) -0.15*(1/sqrt(2))
-0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.15*(1/sqrt(2))
+0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2)) -0.2*(1/sqrt(2))
+0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2))
 0 0 0 0
 ];
 Ixx = 0.0126; %Kgm^2
@@ -63,7 +63,7 @@ ms_to_cms = 100;
 MAVLink_Input_Read_Size = 1024;
 
 % Sample Time of Plant and Controller (100 Hz)
-SampleTime = 0.01;
+SampleTime = 0.004;
 
 
-open('rotor.slx')
+open('SILsim.slx')
