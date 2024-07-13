@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(altitude_controller)
+project(vrs_failsafe_controller)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -10,7 +10,6 @@ project(altitude_controller)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
-  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -70,7 +69,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   std_msgs  # Or other packages containing msgs
 # )
 
 ################################################
@@ -104,8 +103,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES altitude_controller
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  LIBRARIES vrs_failsafe_controller
+#  CATKIN_DEPENDS roscpp rospy
 #  DEPENDS system_lib
 )
 
@@ -118,12 +117,23 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}/include/vrs_failsafe_controller
+  ${CMAKE_SOURCE_DIR}/include/throttle_controller
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/altitude_controller.cpp
-# )
+add_library(${PROJECT_NAME} src/vrs_failsafe_controller.cpp)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+
+add_executable(${PROJECT_NAME}_node src/vrs_failsafe_controller_node.cpp)
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME} ${catkin_LIBRARIES} throttle_controller)
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## add throttle library
+add_library(throttle_controller src/throttle_controller.cpp)
+target_include_directories(throttle_controller PUBLIC include)
+target_compile_features(throttle_controller PUBLIC cxx_std_17)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -133,7 +143,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/altitude_controller_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/vrs_failsafe_controller_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -197,7 +207,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_altitude_controller.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_vrs_failsafe_controller.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
