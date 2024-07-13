@@ -1,0 +1,3 @@
+[submodule "matlab_ws/PX4_Simulink-SIL_HIL-Toolbox"]
+	path = matlab_ws/PX4_Simulink-SIL_HIL-Toolbox
+	url = https://github.com/tommyzhng/PX4-Simulink-SIL_HIL-Toolbox
