@@ -5,7 +5,7 @@ g = 9.81;
 m = 1;
 R = 0.127;
 CDval = 0.008;
-CDDrone = 1.6e-7;
+CDDrone = 0.01;
 Arm = [
 0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2)) -0.2*(1/sqrt(2))
 0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2))
@@ -64,6 +64,5 @@ MAVLink_Input_Read_Size = 1024;
 
 % Sample Time of Plant and Controller (100 Hz)
 SampleTime = 0.004;
-
 
 open('SILsim.slx')
