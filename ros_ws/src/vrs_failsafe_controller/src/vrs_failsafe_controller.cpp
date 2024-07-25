@@ -4,7 +4,7 @@ VrsFailsafeController::VrsFailsafeController(ros::NodeHandle& nh)
 {
     localPositionSub_ = nh.subscribe("/mavros/local_position/pose", 1, &VrsFailsafeController::LocalPositionCallback, this);
     throttleSetpointSub_ = nh.subscribe("/vrs_failsafe/throttle_setpoint", 1, &VrsFailsafeController::ThrottleSetpointCallback, this);
-    //failsafeSub_ = nh.subscribe("/vrs_failsafe_controller/failsafe", 1, &VrsFailsafeController::FailsafeCallback, this);
+    
     localPositionPub_ = nh.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 1);
     thrustPub_ = nh.advertise<mavros_msgs::AttitudeTarget>("/mavros/setpoint_raw/attitude", 1);
 }

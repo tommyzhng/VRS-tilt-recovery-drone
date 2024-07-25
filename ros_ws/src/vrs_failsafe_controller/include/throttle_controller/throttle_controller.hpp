@@ -8,14 +8,20 @@
 class ThrottleController
 {
 public:
-    void UpdateThrottleController(void);
+    void UpdateController(void);
     ThrottleController(ros::NodeHandle& nh);
     ~ThrottleController() = default;
 private:
     void ThrottleSetpointCallback(const mavros_msgs::RCIn::ConstPtr& msg);
     void PubThrottleRequest(float throttle);
-    ros::Subscriber rcThrottleSub_;
+    void PubServoRequest(float angle);
+    void PIDThrottleController();
+    void ServoController();
+    ros::Subscriber localPositionSub_;
     ros::Publisher throttlePub_;
-    float throttle_;
+    ros::Publisher servoPub_;
+    float throttle_{0};
+    float servoAngle_{0};
+    float lastServoAngle_{0};
 };
 #endif

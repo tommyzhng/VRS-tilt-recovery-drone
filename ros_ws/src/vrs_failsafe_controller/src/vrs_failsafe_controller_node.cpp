@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     ros::Rate rate(30.0);
     while (ros::ok())
     {
-        throttleController.UpdateThrottleController();
+        //throttleController.UpdateController();
         controller.UpdateNode();
         ros::spinOnce();
         rate.sleep();
