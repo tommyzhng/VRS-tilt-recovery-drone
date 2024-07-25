@@ -118,22 +118,20 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/include/vrs_failsafe_controller
-  ${CMAKE_SOURCE_DIR}/include/throttle_controller
 )
 
+# Eigen
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
 ## Declare a C++ library
-add_library(${PROJECT_NAME} src/vrs_failsafe_controller.cpp)
+add_library(${PROJECT_NAME} src/vrs_failsafe_controller.cpp src/controllers.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 add_executable(${PROJECT_NAME}_node src/vrs_failsafe_controller_node.cpp)
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME} ${catkin_LIBRARIES} throttle_controller)
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## add throttle library
-add_library(throttle_controller src/throttle_controller.cpp)
-target_include_directories(throttle_controller PUBLIC include)
-target_compile_features(throttle_controller PUBLIC cxx_std_17)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

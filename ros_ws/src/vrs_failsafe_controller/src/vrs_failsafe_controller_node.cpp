@@ -1,5 +1,4 @@
 #include "vrs_failsafe_controller.hpp"
-#include "throttle_controller.hpp"
 
 int main(int argc, char** argv)
 {
@@ -7,12 +6,10 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
 
     VrsFailsafeController controller(nh);
-    ThrottleController throttleController(nh);
-
+    
     ros::Rate rate(30.0);
     while (ros::ok())
     {
-        //throttleController.UpdateController();
         controller.UpdateNode();
         ros::spinOnce();
         rate.sleep();
