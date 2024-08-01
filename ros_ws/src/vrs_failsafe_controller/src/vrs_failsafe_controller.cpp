@@ -114,6 +114,7 @@ void VrsFailsafeController::UpdateNode(void)
     EstimateVRS();
     if (curState_ == "vrsFailsafe") {
         ThrottleController();
+        ServoController();
         PubThrust(throttleSetpoint_);
     } else if (curState_ == "freefall") {
         PubFreeFall();

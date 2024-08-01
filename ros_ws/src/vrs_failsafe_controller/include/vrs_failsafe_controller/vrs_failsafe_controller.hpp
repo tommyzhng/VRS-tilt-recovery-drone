@@ -42,9 +42,9 @@ private:
     void PubDropVel(float vel);
     void PubPositionSetpoint(float x, float y, float z, float yaw);
     // controller funcs
+    void CalculateError();
     void ThrottleController();                                  
     void ServoController();
-    // estimation func
     void EstimateVRS();
     ros::Publisher positionSetpointPub_;
     ros::Publisher thrustPub_;
@@ -70,6 +70,8 @@ private:
     Eigen::Vector3f targetAccel_{0, 0, 0};
     Eigen::Quaternionf targetAttitude_{1, 0, 0, 0};
 
+    Eigen::Vector3f errorAttitudeEuler_{0, 0, 0};
+
     Eigen::Vector3f setpointPosition_{0, 0, 0};
     float setpointDropVel_{0};
     float setpointYaw_{0};
@@ -77,7 +79,7 @@ private:
 
     // failsafe vars
     float throttle_{0};
-    float servoAngle_{0};
+    float servoAngleSetpoint_{0};
     float lastServoAngle_{0};
     float throttleSetpoint_;
     
