@@ -37,7 +37,7 @@ private:
     void GUIDropVelCallback(const std_msgs::Float32::ConstPtr& msg);
     // publisher funcs
     void PubThrust(float thrust);
-    void PubServo(float angle);
+    void PubServo(float tilt);
     void PubFreeFall();
     void PubDropVel(float vel);
     void PubPositionSetpoint(float x, float y, float z, float yaw);
@@ -75,12 +75,12 @@ private:
     Eigen::Vector3f setpointPosition_{0, 0, 0};
     float setpointDropVel_{0};
     float setpointYaw_{0};
-    std::string curState_;
+    std::string curState_{"posSetpoint"};
 
     // failsafe vars
     float throttle_{0};
-    float servoAngleSetpoint_{0};
-    float lastServoAngle_{0};
+    float servoSetpoint_{0};
+    float lastServoSetpoint_{0};
     float throttleSetpoint_;
     
     const float mass_ = 1.0;

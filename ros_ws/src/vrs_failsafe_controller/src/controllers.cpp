@@ -17,14 +17,15 @@ void VrsFailsafeController::ThrottleController()
     }
 }
 /*  response should be based on stability of the drone, in terms of roll pitch and yaw
-    more instability should result in more servo angle */
+    more instability should result in more servo tilt */
 void VrsFailsafeController::ServoController()
 {
     // initially set to 45 degree angle to disrupt the cyclic circulation
     // go back to 0 angle with criterion to get maximum thrust in the down direction
     if (curAccell_(2) <= 0){
-        servoAngleSetpoint_ = 45;
+        servoSetpoint_ = 1;
     }
+    PubServo(servoSetpoint_);
 }
 
 void VrsFailsafeController::EstimateVRS()

@@ -68,6 +68,13 @@ void VrsFailsafeController::PubThrust(float thrust)
     thrustPub_.publish(thrustMsg);
 }
 
+void VrsFailsafeController::PubServo(float tilt)
+{
+    std_msgs::Float32 servoMsg;
+    servoMsg.data = tilt;
+    servoPub_.publish(servoMsg);
+}
+
 void VrsFailsafeController::PubFreeFall()
 {
     mavros_msgs::PositionTarget freefallMsg;
