@@ -17,6 +17,7 @@ VrsFailsafeController::VrsFailsafeController(ros::NodeHandle& nh)
     positionSetpointPub_ = nh.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 1);
     thrustPub_ = nh.advertise<mavros_msgs::AttitudeTarget>("/mavros/setpoint_raw/attitude", 1);
     servoPub_ = nh.advertise<mavros_msgs::ActuatorControl>("/mavros/actuator_control", 1);
+    stateMachineLoopbackPub_ = nh.advertise<std_msgs::String>("/vrs_failsafe/state_machine_loopback", 1);
 }
 
 // subscriber callbacks
@@ -130,9 +131,17 @@ void VrsFailsafeController::PubPositionSetpoint(float x, float y, float z, float
     positionSetpointPub_.publish(localPositionMsg);
 }
 
+void VrsFailsafeController::PubStateMachineLoopback()
+{
+    std_msgs::String loopbackMsg;
+    loopbackMsg.data = curState_;
+    stateMachineLoopbackPub_.publish(loopbackMsg);
+}
+
 void VrsFailsafeController::UpdateNode(void)
 {
     EstimateVRS();
+    PubStateMachineLoopback();
     if (curState_ == "vrsFailsafe") {
         ThrottleController();
         ServoController();

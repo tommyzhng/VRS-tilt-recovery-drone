@@ -46,6 +46,7 @@ private:
     void PubFreeFall();
     void PubDropVel(float vel);
     void PubPositionSetpoint(float x, float y, float z, float yaw);
+    void PubStateMachineLoopback();
     // controller funcs
     void CalculateTargetError();
     void ThrottleController();                                  
@@ -67,6 +68,7 @@ private:
     ros::Publisher positionSetpointPub_;
     ros::Publisher thrustPub_;
     ros::Publisher servoPub_;
+    ros::Publisher stateMachineLoopbackPub_;
 
     // subscriber data holders
     Eigen::Vector3d curLocalPosition_{0, 0, 0};
