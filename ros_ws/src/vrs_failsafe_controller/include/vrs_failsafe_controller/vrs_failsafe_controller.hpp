@@ -10,11 +10,15 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "geometry_msgs/TwistStamped.h"
 #include "sensor_msgs/Imu.h"
+#include <nav_msgs/Odometry.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/String.h>
 #include <mavros_msgs/PositionTarget.h>
 #include <mavros_msgs/AttitudeTarget.h>
+#include <mavros_msgs/ActuatorControl.h>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
+#include <unsupported/Eigen/EulerAngles>
 
 class VrsFailsafeController
 {
@@ -27,14 +31,15 @@ public:
 private:
     // subscriber callbacks
     void LocalPositionCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
-    void LocalVelocityCallback(const geometry_msgs::TwistStamped::ConstPtr& msg);
+    void LocalVelocityCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void AccelCallback(const sensor_msgs::Imu::ConstPtr& msg);
     void AttitudeCallback(const sensor_msgs::Imu::ConstPtr& msg);
     void TargetLocalPositionCallback(const mavros_msgs::PositionTarget::ConstPtr& msg);
     void TargetAttitudeCallback(const mavros_msgs::AttitudeTarget::ConstPtr& msg);
-    void StateMachineCallback(const std_msgs::String::ConstPtr& msg);
+    void GUIStateMachineCallback(const std_msgs::String::ConstPtr& msg);
     void GUISetpointPositionCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
     void GUIDropVelCallback(const std_msgs::Float32::ConstPtr& msg);
+    void GUIServoSetpointCallback(const std_msgs::Float32::ConstPtr& msg);
     // publisher funcs
     void PubThrust(float thrust);
     void PubServo(float tilt);
@@ -42,54 +47,58 @@ private:
     void PubDropVel(float vel);
     void PubPositionSetpoint(float x, float y, float z, float yaw);
     // controller funcs
-    void CalculateError();
+    void CalculateTargetError();
     void ThrottleController();                                  
     void ServoController();
     void EstimateVRS();
-    ros::Publisher positionSetpointPub_;
-    ros::Publisher thrustPub_;
-    ros::Publisher servoPub_;
+    Eigen::Vector3f ToEulerAngles(const Eigen::Quaternionf& q);
+    
     ros::Subscriber positionSub_;
     ros::Subscriber velocitySub_;
     ros::Subscriber accelSub_;
     ros::Subscriber attitudeSub_;
     ros::Subscriber targetPositionSub_;
     ros::Subscriber targetAttitudeSub_;
-    ros::Subscriber guiStateMachine_;
-    ros::Subscriber guiPositionSetpoint_;
-    ros::Subscriber guiDropVelSetpoint_;
-    
+    ros::Subscriber guiStateMachineSub_;
+    ros::Subscriber guiPositionSetpointSub_;
+    ros::Subscriber guiDropVelSetpointSub_;
+    ros::Subscriber guiServoSetpointSub_;
+
+    ros::Publisher positionSetpointPub_;
+    ros::Publisher thrustPub_;
+    ros::Publisher servoPub_;
+
     // subscriber data holders
-    Eigen::Vector3f curLocalPosition_{0, 0, 0};
-    Eigen::Vector3f curLocalVelocity_{0, 0, 0};
-    Eigen::Vector3f curAccel_{0, 0, 0};
+    Eigen::Vector3d curLocalPosition_{0, 0, 0};
+    Eigen::Vector3d curLocalVelocity_{0, 0, 0};
+    Eigen::Vector3d curAccel_{0, 0, 0};
     Eigen::Quaternionf curAttitude_{1, 0, 0, 0};
     
-    Eigen::Vector3f targetLocalPosition_{0, 0, 0};
-    Eigen::Vector3f targetLocalVelocity_{0, 0, 0};
-    Eigen::Vector3f targetAccel_{0, 0, 0};
+    Eigen::Vector3d targetLocalPosition_{0, 0, 0};
+    Eigen::Vector3d targetLocalVelocity_{0, 0, 0};
+    Eigen::Vector3d targetAccel_{0, 0, 0};
     Eigen::Quaternionf targetAttitude_{1, 0, 0, 0};
 
-    Eigen::Vector3f errorAttitudeEuler_{0, 0, 0};
+    Eigen::Vector3f errorAttitudeEuler_{0,0,0};
 
-    Eigen::Vector3f setpointPosition_{0, 0, 0};
+    Eigen::Vector3d setpointPosition_{0, 0, 0};
     float setpointDropVel_{0};
     float setpointYaw_{0};
     std::string curState_{"posSetpoint"};
 
     // failsafe vars
-    float throttle_{0};
     float servoSetpoint_{0};
+    float guiServoSetpoint_{0};
     float lastServoSetpoint_{0};
-    float throttleSetpoint_;
+    float throttleSetpoint_{0};
     
     const float mass_ = 1.0;
     const float propRadius = 0.127;
-    const float vh = sqrt((mass_ * 9.81 / 4)/2*1.225*propRadius);
+    const float vh = sqrt((mass_ * 9.81/4)/(2*1.225*(M_PI*pow(propRadius, 2))));  // m/s
 
     const float maxSafeVelocity = 0.28 * vh;    // m/s
-    const float maxYawError = 6.5;      // degrees
-    const float maxRollPitchError = 5;  // degrees
+    // const float maxYawError = 6.5;      // degrees
+    // const float maxRollPitchError = 5;  // degrees
 };
 
 #endif

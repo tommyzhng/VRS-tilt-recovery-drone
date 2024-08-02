@@ -3,18 +3,20 @@
 VrsFailsafeController::VrsFailsafeController(ros::NodeHandle& nh)
 {
     positionSub_ = nh.subscribe("/mavros/local_position/pose", 1, &VrsFailsafeController::LocalPositionCallback, this);
-    velocitySub_ = nh.subscribe("/mavros/local_position/velocity", 1, &VrsFailsafeController::LocalVelocityCallback, this);
+    velocitySub_ = nh.subscribe("/mavros/local_position/odom", 1, &VrsFailsafeController::LocalVelocityCallback, this);
     accelSub_ = nh.subscribe("/mavros/imu/data", 1, &VrsFailsafeController::AccelCallback, this);
     attitudeSub_ = nh.subscribe("/mavros/imu/data", 1, &VrsFailsafeController::AttitudeCallback, this);
     targetPositionSub_ = nh.subscribe("/mavros/setpoint_raw/target_local", 1, &VrsFailsafeController::TargetLocalPositionCallback, this);
     targetAttitudeSub_ = nh.subscribe("/mavros/setpoint_raw/target_attitude", 1, &VrsFailsafeController::TargetAttitudeCallback, this);
-    guiStateMachine_ = nh.subscribe("/vrs_failsafe/state", 1, &VrsFailsafeController::StateMachineCallback, this);
-    guiPositionSetpoint_ = nh.subscribe("/vrs_failsafe/setpoint_position", 1, &VrsFailsafeController::GUISetpointPositionCallback, this);
-    guiDropVelSetpoint_ = nh.subscribe("/vrs_failsafe/setpoint_drop_vel", 1, &VrsFailsafeController::GUIDropVelCallback, this);
+   
+    guiStateMachineSub_ = nh.subscribe("/vrs_failsafe/state", 1, &VrsFailsafeController::GUIStateMachineCallback, this);
+    guiPositionSetpointSub_ = nh.subscribe("/vrs_failsafe/setpoint_position", 1, &VrsFailsafeController::GUISetpointPositionCallback, this);
+    guiDropVelSetpointSub_ = nh.subscribe("/vrs_failsafe/setpoint_drop_vel", 1, &VrsFailsafeController::GUIDropVelCallback, this);
+    guiServoSetpointSub_ = nh.subscribe("/vrs_failsafe/gui_servo_setpoint", 1, &VrsFailsafeController::GUIServoSetpointCallback, this);
 
     positionSetpointPub_ = nh.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 1);
     thrustPub_ = nh.advertise<mavros_msgs::AttitudeTarget>("/mavros/setpoint_raw/attitude", 1);
-    servoPub_ = nh.advertise<std_msgs::Float32>("/vrs_failsafe/servo_setpoint", 1);
+    servoPub_ = nh.advertise<mavros_msgs::ActuatorControl>("/mavros/actuator_control", 1);
 }
 
 // subscriber callbacks
@@ -22,9 +24,9 @@ void VrsFailsafeController::LocalPositionCallback(const geometry_msgs::PoseStamp
 {
     curLocalPosition_ << msg->pose.position.x, msg->pose.position.y, msg->pose.position.z;
 }
-void VrsFailsafeController::LocalVelocityCallback(const geometry_msgs::TwistStamped::ConstPtr& msg)
+void VrsFailsafeController::LocalVelocityCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
-    curLocalVelocity_ << msg->twist.linear.x, msg->twist.linear.y, msg->twist.linear.z;
+    curLocalVelocity_ << msg->twist.twist.linear.x, msg->twist.twist.linear.y, msg->twist.twist.linear.z;
 }
 void VrsFailsafeController::AccelCallback(const sensor_msgs::Imu::ConstPtr& msg)
 {
@@ -51,7 +53,11 @@ void VrsFailsafeController::GUIDropVelCallback(const std_msgs::Float32::ConstPtr
 {
     setpointDropVel_ = msg->data;
 }
-void VrsFailsafeController::StateMachineCallback(const std_msgs::String::ConstPtr& msg)
+void VrsFailsafeController::GUIServoSetpointCallback(const std_msgs::Float32::ConstPtr& msg)
+{
+    guiServoSetpoint_ = msg->data;
+}
+void VrsFailsafeController::GUIStateMachineCallback(const std_msgs::String::ConstPtr& msg)
 {
     if (msg->data == "vrsFailsafe"){
         return;
@@ -63,15 +69,23 @@ void VrsFailsafeController::PubThrust(float thrust)
 {
     mavros_msgs::AttitudeTarget thrustMsg;
     thrustMsg.header.stamp = ros::Time::now();
-    thrustMsg.type_mask = mavros_msgs::AttitudeTarget::IGNORE_ATTITUDE | mavros_msgs::AttitudeTarget::IGNORE_ROLL_RATE | mavros_msgs::AttitudeTarget::IGNORE_YAW_RATE;
+    thrustMsg.type_mask = mavros_msgs::AttitudeTarget::IGNORE_ROLL_RATE | mavros_msgs::AttitudeTarget::IGNORE_YAW_RATE;
+    thrustMsg.orientation.w = 1;
+    thrustMsg.orientation.x = 0;
+    thrustMsg.orientation.y = 0;
+    thrustMsg.orientation.z = 0;
     thrustMsg.thrust = thrust;
     thrustPub_.publish(thrustMsg);
 }
 
 void VrsFailsafeController::PubServo(float tilt)
 {
-    std_msgs::Float32 servoMsg;
-    servoMsg.data = tilt;
+    int tiltPwm = 1000 + ((tilt+45)/90) * 1000;
+    mavros_msgs::ActuatorControl servoMsg;
+    servoMsg.header.stamp = ros::Time::now();
+    servoMsg.group_mix = 0;
+    servoMsg.controls[5] = tiltPwm;
+    servoMsg.controls[6] = tiltPwm;
     servoPub_.publish(servoMsg);
 }
 
@@ -122,13 +136,13 @@ void VrsFailsafeController::UpdateNode(void)
     if (curState_ == "vrsFailsafe") {
         ThrottleController();
         ServoController();
-        PubThrust(throttleSetpoint_);
     } else if (curState_ == "freefall") {
         PubFreeFall();
     } else if (curState_ == "dropVelSetpoint") {
         PubDropVel(setpointDropVel_);
     } else if (curState_ == "posSetpoint") {
         PubPositionSetpoint(setpointPosition_[0], setpointPosition_[1], setpointPosition_[2], setpointYaw_);
+        PubServo(guiServoSetpoint_);
     } else {
         return;
     }
