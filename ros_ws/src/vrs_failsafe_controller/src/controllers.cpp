@@ -46,16 +46,26 @@ void VrsFailsafeController::ThrottleController()
     // open loop control
     if (curLocalVelocity_(2) <= -vh) {
         throttleSetpoint_ = 1.0;
+        PubThrust(throttleSetpoint_);
         return;
     } 
     // closed loop control in acceleration with pid and tilt angle feedforward
     p_velError_ = 0 - curLocalVelocity_(2);
     i_velErrorSum_ += p_velError_;
-    double d_velErrorDer = p_velError_ - lastVelError_;
-    lastVelError_ = p_velError_ / ros::Duration(0.01).toSec();
+    double d_velErrorDer = (p_velError_ - lastVelError_) / ros::Duration(0.01).toSec();;
+    lastVelError_ = p_velError_;
 
-    throttleSetpoint_ = 0.1 * p_velError_ + 0.01 * i_velErrorSum_;
+    float T_u = 0.5 * 0.7;
+    float T_d = 0.125 * 0.7;
 
+    throttleSetpoint_ = 0.0001 * p_velError_ + 1 * i_velErrorSum_ + 1 * d_velErrorDer;
+
+    // saturate the throttle setpoint
+    if (throttleSetpoint_ > 1.0) {
+        throttleSetpoint_ = 1.0;
+    } else if (throttleSetpoint_ < 0.0) {
+        throttleSetpoint_ = 0.0;
+    }
 
     PubThrust(throttleSetpoint_);
 }
@@ -81,7 +91,7 @@ void VrsFailsafeController::EstimateVRS()
         if (sqrt(pow(curLocalVelocity_(0), 2) + pow(curLocalVelocity_(1), 2)) < 0.7) {  // see if velocity magnitude is less than 0.7 m/s
             if (errorAttitudeEuler_(0) > 5 || errorAttitudeEuler_(1) > 5 || errorAttitudeEuler_(2) > 5) {  // check if roll and pitch are within 5 degrees
                 curState_ = "vrsFailsafe";
-                ROS_WARN("VRS Detected");
+                //ROS_WARN("VRS Detected");
             }
         }
     }

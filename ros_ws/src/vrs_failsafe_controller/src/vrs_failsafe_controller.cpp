@@ -72,7 +72,7 @@ void VrsFailsafeController::PubThrust(float thrust)
 {
     mavros_msgs::AttitudeTarget thrustMsg;
     thrustMsg.header.stamp = ros::Time::now();
-    thrustMsg.type_mask = mavros_msgs::AttitudeTarget::IGNORE_ROLL_RATE | mavros_msgs::AttitudeTarget::IGNORE_YAW_RATE;
+    thrustMsg.type_mask = mavros_msgs::AttitudeTarget::IGNORE_ROLL_RATE | mavros_msgs::AttitudeTarget::IGNORE_PITCH_RATE | mavros_msgs::AttitudeTarget::IGNORE_YAW_RATE;
     thrustMsg.orientation.w = 1;
     thrustMsg.orientation.x = 0;
     thrustMsg.orientation.y = 0;
@@ -83,12 +83,13 @@ void VrsFailsafeController::PubThrust(float thrust)
 
 void VrsFailsafeController::PubServo(float tilt)
 {
-    int tiltPwm1 = 1000 + ((tilt+45)/90) * 1000;
+    // normalize tilt between -1 and 1 from -45 and 45
+    float tiltNorm = tilt / 45;
     mavros_msgs::ActuatorControl servoMsg;
     servoMsg.header.stamp = ros::Time::now();
     servoMsg.group_mix = 0;
-    servoMsg.controls[0] = 0.8;
-    servoMsg.controls[1] = 0.8;
+    servoMsg.controls[5] = tiltNorm;
+    servoMsg.controls[6] = tiltNorm;
     servoPub_.publish(servoMsg);
 }
 
@@ -104,7 +105,7 @@ void VrsFailsafeController::PubFreeFall()
     // freefall
     freefallMsg.acceleration_or_force.z = -9.81;
     positionSetpointPub_.publish(freefallMsg);
-    }
+}
 
 void VrsFailsafeController::PubDropVel(float vel)
 {
@@ -149,6 +150,7 @@ void VrsFailsafeController::UpdateNode(void)
     if (curState_ == "vrsFailsafe") {
         ThrottleController();
         ServoController();
+        ROS_INFO("Throttle: %f, Servo: %f", throttleSetpoint_, servoSetpoint_);
     } else if (curState_ == "freefall") {
         PubFreeFall();
     } else if (curState_ == "dropVelSetpoint") {
