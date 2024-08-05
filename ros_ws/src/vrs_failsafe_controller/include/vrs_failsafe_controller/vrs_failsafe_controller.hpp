@@ -16,6 +16,7 @@
 #include <mavros_msgs/PositionTarget.h>
 #include <mavros_msgs/AttitudeTarget.h>
 #include <mavros_msgs/ActuatorControl.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <unsupported/Eigen/EulerAngles>
@@ -93,6 +94,10 @@ private:
     float guiServoSetpoint_{0};
     float lastServoSetpoint_{0};
     float throttleSetpoint_{0};
+
+    float p_velError_{0};
+    float i_velErrorSum_{0};
+    float lastVelError_{0};
     
     const float mass_ = 1.0;
     const float propRadius = 0.127;

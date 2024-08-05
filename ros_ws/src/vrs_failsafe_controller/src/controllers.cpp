@@ -43,9 +43,20 @@ void VrsFailsafeController::CalculateTargetError()
     because response is unknown at this stage since there is assumed to be a random sine wave applied to thrust */
 void VrsFailsafeController::ThrottleController()
 {
+    // open loop control
     if (curLocalVelocity_(2) <= -vh) {
         throttleSetpoint_ = 1.0;
-    }
+        return;
+    } 
+    // closed loop control in acceleration with pid and tilt angle feedforward
+    p_velError_ = 0 - curLocalVelocity_(2);
+    i_velErrorSum_ += p_velError_;
+    double d_velErrorDer = p_velError_ - lastVelError_;
+    lastVelError_ = p_velError_ / ros::Duration(0.01).toSec();
+
+    throttleSetpoint_ = 0.1 * p_velError_ + 0.01 * i_velErrorSum_;
+
+
     PubThrust(throttleSetpoint_);
 }
 /*  response should be based on stability of the drone, in terms of roll pitch and yaw
@@ -54,7 +65,7 @@ void VrsFailsafeController::ServoController()
 {
     // initially set to 45 degree angle to disrupt the cyclic circulation
     // go back to 0 angle with criterion to get maximum thrust in the down direction
-    if (curLocalVelocity_(2) <= -vh) {
+    if (curAccel_(2) < 9.81) { // check if vehicle is still accelerating downwards
         servoSetpoint_ = 45;
     }
     PubServo(servoSetpoint_);
@@ -62,7 +73,7 @@ void VrsFailsafeController::ServoController()
 
 void VrsFailsafeController::EstimateVRS()
 {   
-    ROS_INFO("Current State: %s", curState_.c_str());
+    //ROS_INFO("Current State: %s", curState_.c_str());
     CalculateTargetError();
     // satisfy some critereons to change curState to vrsDetected
     if (curLocalVelocity_(2) < -0.28 * vh) {  // Xin and Gao criterion

@@ -18,6 +18,8 @@ VrsFailsafeController::VrsFailsafeController(ros::NodeHandle& nh)
     thrustPub_ = nh.advertise<mavros_msgs::AttitudeTarget>("/mavros/setpoint_raw/attitude", 1);
     servoPub_ = nh.advertise<mavros_msgs::ActuatorControl>("/mavros/actuator_control", 1);
     stateMachineLoopbackPub_ = nh.advertise<std_msgs::String>("/vrs_failsafe/state_machine_loopback", 1);
+
+    
 }
 
 // subscriber callbacks
@@ -81,12 +83,12 @@ void VrsFailsafeController::PubThrust(float thrust)
 
 void VrsFailsafeController::PubServo(float tilt)
 {
-    int tiltPwm = 1000 + ((tilt+45)/90) * 1000;
+    int tiltPwm1 = 1000 + ((tilt+45)/90) * 1000;
     mavros_msgs::ActuatorControl servoMsg;
     servoMsg.header.stamp = ros::Time::now();
     servoMsg.group_mix = 0;
-    servoMsg.controls[5] = tiltPwm;
-    servoMsg.controls[6] = tiltPwm;
+    servoMsg.controls[0] = 0.8;
+    servoMsg.controls[1] = 0.8;
     servoPub_.publish(servoMsg);
 }
 
@@ -102,7 +104,7 @@ void VrsFailsafeController::PubFreeFall()
     // freefall
     freefallMsg.acceleration_or_force.z = -9.81;
     positionSetpointPub_.publish(freefallMsg);
-}
+    }
 
 void VrsFailsafeController::PubDropVel(float vel)
 {
@@ -121,14 +123,16 @@ void VrsFailsafeController::PubPositionSetpoint(float x, float y, float z, float
 {
     mavros_msgs::PositionTarget localPositionMsg;
     localPositionMsg.header.stamp = ros::Time::now();
+    localPositionMsg.header.frame_id = "home";
     localPositionMsg.coordinate_frame = mavros_msgs::PositionTarget::FRAME_LOCAL_NED;
     // typemask ignores everything except for the position
-    localPositionMsg.type_mask = mavros_msgs::PositionTarget::IGNORE_AFX | mavros_msgs::PositionTarget::IGNORE_AFY | mavros_msgs::PositionTarget::IGNORE_AFZ | mavros_msgs::PositionTarget::IGNORE_VZ | mavros_msgs::PositionTarget::IGNORE_YAW_RATE;
+    localPositionMsg.type_mask = mavros_msgs::PositionTarget::IGNORE_AFX + mavros_msgs::PositionTarget::IGNORE_AFY + mavros_msgs::PositionTarget::IGNORE_AFZ + mavros_msgs::PositionTarget::IGNORE_VZ + mavros_msgs::PositionTarget::IGNORE_YAW_RATE;
+    //localPositionMsg.type_mask = 4088;
     localPositionMsg.position.x = x;
     localPositionMsg.position.y = y;
     localPositionMsg.position.z = z;
     localPositionMsg.yaw = yaw * M_PI / 180.0;
-    positionSetpointPub_.publish(localPositionMsg);
+    positionSetpointPub_.publish(localPositionMsg);    
 }
 
 void VrsFailsafeController::PubStateMachineLoopback()
