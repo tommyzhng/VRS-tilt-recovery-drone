@@ -1,18 +1,15 @@
-// throttle pid controller parameters
-
 {
-"throttle_pid": {
-    "kp": 0.1,
-    "ki": 0.0,
-    "kd": 0.0,
-    "min": 0.0,
-    "max": 1.0
+    "servo_pid": {
+      "ff": 0.001,
+      "kp": 0.001,
+      "ki": 0.0,
+      "kd": 0.0002
     },
-"servo_pid": {
-    "kp": 0.1,
-    "ki": 0.0,
-    "kd": 0.0,
-    "min": 0.0,
-    "max": 1.0
+    "throttle_pid": {
+      "ff": 0.001,
+      "kp": 0.001,
+      "ki": 0.0,
+      "kd": 0.0002
     }
-}
+  }
+  

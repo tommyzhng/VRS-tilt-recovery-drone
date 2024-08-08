@@ -1,4 +1,6 @@
 <launch>
   <!-- vrs_failsafe_controller_node -->
   <node pkg="vrs_failsafe_controller" type="vrs_failsafe_controller_node" name="vrs_failsafe_controller_node" output="screen" />
+<!-- params-->
+  <rosparam command="load" file="$(find vrs_failsafe_controller)/config/params.json" />
 </launch>

@@ -20,6 +20,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <unsupported/Eigen/EulerAngles>
+#include <mavros_msgs/OverrideRCIn.h>
+#include <mavros_msgs/CommandLong.h>
 
 class VrsFailsafeController
 {
@@ -31,7 +33,7 @@ public:
 
 private:
     // subscriber callbacks
-    void LocalPositionCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
+    void LocalPositionCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void LocalVelocityCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void AccelCallback(const sensor_msgs::Imu::ConstPtr& msg);
     void AttitudeCallback(const sensor_msgs::Imu::ConstPtr& msg);
@@ -55,7 +57,7 @@ private:
     void EstimateVRS();
     Eigen::Vector3f ToEulerAngles(const Eigen::Quaternionf& q);
     
-    ros::Subscriber positionSub_;
+    ros::Subscriber odomSub_;
     ros::Subscriber velocitySub_;
     ros::Subscriber accelSub_;
     ros::Subscriber attitudeSub_;
@@ -70,6 +72,7 @@ private:
     ros::Publisher thrustPub_;
     ros::Publisher servoPub_;
     ros::Publisher stateMachineLoopbackPub_;
+    ros::ServiceClient servo_cmd_srv_;
 
     // subscriber data holders
     Eigen::Vector3d curLocalPosition_{0, 0, 0};
@@ -83,6 +86,7 @@ private:
     Eigen::Quaternionf targetAttitude_{1, 0, 0, 0};
 
     Eigen::Vector3f errorAttitudeEuler_{0,0,0};
+    float lastStabilityError_{0};
 
     Eigen::Vector3d setpointPosition_{0, 0, 0};
     float setpointDropVel_{0};
@@ -98,6 +102,10 @@ private:
     float p_velError_{0};
     float i_velErrorSum_{0};
     float lastVelError_{0};
+
+    double servoKp;
+    double servoKi;
+    double servoKd;
     
     const float mass_ = 1.0;
     const float propRadius = 0.127;
