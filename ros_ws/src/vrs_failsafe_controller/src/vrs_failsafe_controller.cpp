@@ -94,28 +94,28 @@ void VrsFailsafeController::PubServo(float tilt)
 {
     // normalize tilt between -1 and 1 from -45 and 45
     float tiltNorm = tilt/45;
-    // // Create the service request
-    // mavros_msgs::CommandLong srv;
-    // srv.request.broadcast = false;
-    // srv.request.command = 187; // MAV_CMD_DO_SET_ACTUATOR
-    // srv.request.confirmation = 0;
-    // srv.request.param1 = tiltNorm; // Set this to -1.0 if needed
-    // srv.request.param2 = std::numeric_limits<float>::quiet_NaN();
-    // srv.request.param3 = std::numeric_limits<float>::quiet_NaN();
-    // srv.request.param4 = std::numeric_limits<float>::quiet_NaN();
-    // srv.request.param5 = std::numeric_limits<float>::quiet_NaN();
-    // srv.request.param6 = std::numeric_limits<float>::quiet_NaN();
-    // srv.request.param7 = 0;
+    // Create the service request
+    mavros_msgs::CommandLong srv;
+    srv.request.broadcast = false;
+    srv.request.command = 187; // MAV_CMD_DO_SET_ACTUATOR
+    srv.request.confirmation = 0;
+    srv.request.param1 = tiltNorm; // Set this to -1.0 if needed
+    srv.request.param2 = std::numeric_limits<float>::quiet_NaN();
+    srv.request.param3 = std::numeric_limits<float>::quiet_NaN();
+    srv.request.param4 = std::numeric_limits<float>::quiet_NaN();
+    srv.request.param5 = std::numeric_limits<float>::quiet_NaN();
+    srv.request.param6 = std::numeric_limits<float>::quiet_NaN();
+    srv.request.param7 = 0;
 
     // pub to servoPub
-    mavros_msgs::ActuatorControl servoMsg;
-    servoMsg.header.stamp = ros::Time::now();
-    servoMsg.group_mix = 0;
-    servoMsg.controls[0] = tiltNorm;
-    servoPub_.publish(servoMsg);
+    // mavros_msgs::ActuatorControl servoMsg;
+    // servoMsg.header.stamp = ros::Time::now();
+    // servoMsg.group_mix = 0;
+    // servoMsg.controls[0] = tiltNorm;
+    // servoPub_.publish(servoMsg);
 
     // Call the service
-    //servo_cmd_srv_.call(srv);
+    servo_cmd_srv_.call(srv);
 }
 
 void VrsFailsafeController::PubFreeFall()
