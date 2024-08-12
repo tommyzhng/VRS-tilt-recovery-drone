@@ -1,0 +1,3 @@
+[submodule "/home/tommy/Projects/VRS-tilt-recovery-drone/ros_ws/src/vrs_failsafe_controller/include/WiringPi"]
+	path = /home/tommy/Projects/VRS-tilt-recovery-drone/ros_ws/src/vrs_failsafe_controller/include/WiringPi
+	url = https://github.com/WiringPi/WiringPi.git
