@@ -16,7 +16,7 @@ VrsFailsafeController::VrsFailsafeController(ros::NodeHandle& nh)
     positionSetpointPub_ = nh.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 1);
     thrustPub_ = nh.advertise<mavros_msgs::AttitudeTarget>("/mavros/setpoint_raw/attitude", 1);
     servoPub_ = nh.advertise<mavros_msgs::OverrideRCIn>("/mavross/actuator_control", 1);
-    
+
     stateMachineLoopbackPub_ = nh.advertise<std_msgs::String>("/vrs_failsafe/state_machine_loopback", 1);
 
 
@@ -100,6 +100,33 @@ void VrsFailsafeController::PubServo(float tilt)
     servoMsg.group_mix = 0;
     servoMsg.controls[0] = tiltNorm;
     servoPub_.publish(servoMsg);
+}
+
+int VrsFailsafeController::ConvertTiltToPWM(float tilt)
+{
+    // Ensure the input is within the range of -1 to +1
+    input = std::max(-1.0f, std::min(1.0f, input));
+
+    // Scale the input to the PWM range
+    int pwmValue = static_cast<int>((input + 1.0f) / 2.0f * (maxPWM - minPWM) + minPWM);
+    return pwmValue;
+}
+
+void VrsFailsafeController::OutputPWM(float tilt) 
+{
+#ifdef __arm__
+    int pwmValue = ConvertToPWM(tilt);
+
+    // Assuming you are using wiringPi library to output PWM to a specific GPIO pin
+    int pwmPin = 1;  // Example GPIO pin
+
+    // Set the PWM value to the pin
+    pwmWrite(pwmPin, pwmValue);
+
+    ROS_INFO("Input: %f, PWM: %d", input, pwmValue);
+#else
+    ROS_WARN("OutputPWM is not supported on this platform.");
+#endif
 }
 
 void VrsFailsafeController::PubFreeFall()

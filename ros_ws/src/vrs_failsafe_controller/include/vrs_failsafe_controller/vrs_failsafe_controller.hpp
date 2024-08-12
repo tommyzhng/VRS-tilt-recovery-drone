@@ -23,6 +23,15 @@
 #include <mavros_msgs/OverrideRCIn.h>
 #include <mavros_msgs/CommandLong.h>
 
+// Wiring Pi
+#ifdef __arm__
+#include <wiringPi.h>
+#endif
+
+// max and min PWM
+#define MAX_PWM 2000
+#define MIN_PWM 1000
+
 class VrsFailsafeController
 {
 public:
@@ -46,6 +55,8 @@ private:
     // publisher funcs
     void PubThrust(float thrust);
     void PubServo(float tilt);
+    int ConvertTiltToPWM(float tilt);
+    void OutputPWM(float tilt);
     void PubFreeFall();
     void PubDropVel(float vel);
     void PubPositionSetpoint(float x, float y, float z, float yaw);
