@@ -72,6 +72,7 @@ private:
     ros::Publisher thrustPub_;
     ros::Publisher servoPub_;
     ros::Publisher stateMachineLoopbackPub_;
+    ros::Publisher servoPiPub;
     ros::ServiceClient servo_cmd_srv_;
 
     // subscriber data holders
