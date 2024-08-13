@@ -145,16 +145,33 @@ int VrsFailsafeController::ConvertTiltToPWM(float tilt, float servoMin, float se
 
 void VrsFailsafeController::PubFreeFall()
 {
-    mavros_msgs::PositionTarget freefallMsg;
-    freefallMsg.header.stamp = ros::Time::now();
-    freefallMsg.coordinate_frame = mavros_msgs::PositionTarget::FRAME_LOCAL_NED;
-    // typemask ignores everything except for the position and accel z
-    freefallMsg.type_mask = mavros_msgs::PositionTarget::IGNORE_AFX | mavros_msgs::PositionTarget::IGNORE_AFY | mavros_msgs::PositionTarget::IGNORE_PZ | mavros_msgs::PositionTarget::IGNORE_VZ | mavros_msgs::PositionTarget::IGNORE_YAW | mavros_msgs::PositionTarget::IGNORE_YAW_RATE;
-    freefallMsg.position.x = curLocalPosition_[0];
-    freefallMsg.position.y = curLocalPosition_[1];
-    // freefall
-    freefallMsg.acceleration_or_force.z = -9.81;
-    positionSetpointPub_.publish(freefallMsg);
+    // mavros_msgs::PositionTarget freefallMsg;
+    // freefallMsg.header.stamp = ros::Time::now();
+    // freefallMsg.coordinate_frame = mavros_msgs::PositionTarget::FRAME_LOCAL_NED;
+    // // typemask ignores everything except for the position and accel z
+    // freefallMsg.type_mask = mavros_msgs::PositionTarget::IGNORE_AFX | mavros_msgs::PositionTarget::IGNORE_AFY | mavros_msgs::PositionTarget::IGNORE_PZ | mavros_msgs::PositionTarget::IGNORE_VZ | mavros_msgs::PositionTarget::IGNORE_YAW | mavros_msgs::PositionTarget::IGNORE_YAW_RATE;
+    // freefallMsg.position.x = curLocalPosition_[0];
+    // freefallMsg.position.y = curLocalPosition_[1];
+    // // freefall
+    // freefallMsg.acceleration_or_force.z = -9.81;
+    // positionSetpointPub_.publish(freefallMsg);
+        // Sine wave parameters
+    double frequency = 1.0 / 3.0;  // Frequency in Hz
+    double amplitude = 1.0;        // Amplitude of the sine wave
+    double phase_shift = M_PI;     // Phase shift to make the wave range from 0 to -1
+
+    // Current time
+    double current_time = ros::Time::now().toSec();
+    
+    // Calculate the elapsed time
+    static double start_time = current_time;  // Initialize start_time on the first call
+    double elapsed_time = current_time - start_time;
+
+    // Calculate the sine wave value
+    double tilt = -0.5 * (std::sin(2 * M_PI * frequency * elapsed_time + phase_shift) + 1);
+    PubServo(tilt);
+    ROS_INFO("%d", tilt);
+
 }
 
 void VrsFailsafeController::PubDropVel(float vel)
@@ -197,7 +214,7 @@ void VrsFailsafeController::PubStateMachineLoopback()
 
 void VrsFailsafeController::UpdateNode(void)
 {
-    EstimateVRS();
+    //EstimateVRS();
     PubStateMachineLoopback();
     if (curState_ == "vrsFailsafe") {
         ThrottleController();
