@@ -134,6 +134,7 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};/home/pi/VRS-tilt-recovery-drone/ros_ws/src/WiringPi")
     find_package(WiringPi REQUIRED)
     add_definitions(-D__arm__)
 endif()
