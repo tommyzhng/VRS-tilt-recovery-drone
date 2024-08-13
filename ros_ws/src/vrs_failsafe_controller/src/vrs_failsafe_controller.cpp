@@ -116,7 +116,7 @@ int VrsFailsafeController::ConvertTiltToPWM(float tilt)
 void VrsFailsafeController::OutputPWM(float tilt) 
 {
 #ifdef __arm__
-    int pwmValue = ConvertToPWM(tilt);
+    int pwmValue = ConvertTiltToPWM(tilt);
 
     // Assuming you are using wiringPi library to output PWM to a specific GPIO pin
     int pwmPin = 12;  // Example GPIO pin
@@ -126,7 +126,7 @@ void VrsFailsafeController::OutputPWM(float tilt)
 
     ROS_INFO("Input: %f, PWM: %d", tilt, pwmValue);
 #else
-    ROS_WARN("OutputPWM is not supported on this platform.");
+
 #endif
 }
 
