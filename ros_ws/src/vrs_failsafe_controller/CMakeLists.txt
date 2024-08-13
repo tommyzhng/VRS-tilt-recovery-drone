@@ -133,6 +133,17 @@ add_executable(${PROJECT_NAME}_node src/vrs_failsafe_controller_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    find_package(WiringPi REQUIRED)
+    add_definitions(-D__arm__)
+endif()
+
+
+target_link_libraries(${PROJECT_NAME}_node
+    ${catkin_LIBRARIES}
+    ${WIRINGPI_LIBRARIES}
+)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
