@@ -1,6 +1,3 @@
-[submodule "ros_ws/src/WiringPi"]
-	path = ros_ws/src/WiringPi
-	url = https://github.com/WiringPi/WiringPi.git
 [submodule "ros_ws/src/ros-qt-drone-app"]
     path = ros_ws/src/ros-qt-drone-app
     url = https://github.com/tommyzhng/ros-qt-drone-app.git
