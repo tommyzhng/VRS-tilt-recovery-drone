@@ -106,6 +106,10 @@ void VrsFailsafeController::PubServo(float tilt)
     servoMsg.group_mix = 0;
     servoMsg.controls[0] = tiltNorm;
     servoPub_.publish(servoMsg);
+
+    // saturate output to -1 and 1
+    if(tiltNorm < -1) {tiltNorm = -1;}
+    else if (tiltNorm > 1) {tiltNorm = 1;}
     
     // publish to the servo node
     std_msgs::Int32 tiltMsg1;
