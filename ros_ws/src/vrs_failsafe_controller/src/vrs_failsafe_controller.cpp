@@ -170,7 +170,7 @@ void VrsFailsafeController::PubFreeFall()
     // Calculate the sine wave value
     double tilt = -0.5 * (std::sin(2 * M_PI * frequency * elapsed_time + phase_shift) + 1);
     PubServo(tilt);
-    ROS_INFO("%d", tilt);
+    ROS_INFO("%f", tilt);
 
 }
 
