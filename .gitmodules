@@ -4,3 +4,6 @@
 [submodule "ros_ws/src/ros-qt-drone-app"]
     path = ros_ws/src/ros-qt-drone-app
     url = https://github.com/tommyzhng/ros-qt-drone-app.git
+[submodule "ros_ws/src/pgd_rcio"]
+	path = ros_ws/src/pgd_rcio
+	url = https://github.com/seiga-k/pgd_rcio
