@@ -24,19 +24,9 @@
 #include <mavros_msgs/CommandLong.h>
 #include <std_msgs/Int32.h>
 
-// Wiring Pi
-#ifdef __arm__
-#include <wiringPi.h>
-#endif
-
-// max and min PWM
-#define MAX_PWM 2000
-#define MIN_PWM 1000
-
 class VrsFailsafeController
 {
 public:
-
     void UpdateNode(void);
     VrsFailsafeController(ros::NodeHandle& nh);
     ~VrsFailsafeController() = default;
@@ -56,13 +46,12 @@ private:
     // publisher funcs
     void PubThrust(float thrust);
     void PubServo(float tilt);
-    int ConvertTiltToPWM(float tilt);
-    void OutputPWM(float tilt);
     void PubFreeFall();
     void PubDropVel(float vel);
     void PubPositionSetpoint(float x, float y, float z, float yaw);
     void PubStateMachineLoopback();
     // controller funcs
+    int ConvertTiltToPWM(float tilt, float servoMin, float servoMax);
     void CalculateTargetError();
     void ThrottleController();                                  
     void ServoController();
@@ -107,6 +96,12 @@ private:
     float setpointYaw_{0};
     std::string curState_{"posSetpoint"};
 
+    // servo trim
+    float servo1Min_;
+    float servo1Max_;
+    float servo2Min_;
+    float servo2Max_;
+
     // failsafe vars
     float servoSetpoint_{0};
     float guiServoSetpoint_{0};
@@ -126,8 +121,6 @@ private:
     const float vh = sqrt((mass_ * 9.81/4)/(2*1.225*(M_PI*pow(propRadius, 2))));  // m/s
 
     const float maxSafeVelocity = 0.28 * vh;    // m/s
-    // const float maxYawError = 6.5;      // degrees
-    // const float maxRollPitchError = 5;  // degrees
 };
 
 #endif

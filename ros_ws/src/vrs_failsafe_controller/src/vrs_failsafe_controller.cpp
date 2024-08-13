@@ -32,6 +32,10 @@ VrsFailsafeController::VrsFailsafeController(ros::NodeHandle& nh)
     nh.param("servo_pid/kp", servoKp, 0.0);
     nh.param("servo_pid/ki", servoKi, 0.0);
     nh.param("servo_pid/kd", servoKd, 0.0);
+    nh.param("servo_trim/min1", servo1Min_, 1000.0f);
+    nh.param("servo_trim/max1", servo1Max_, 2000.0f);
+    nh.param("servo_trim/min2", servo2Min_, 1000.0f);
+    nh.param("servo_trim/max2", servo2Max_, 2000.0f);
 
     ROS_INFO("VRS Failsafe Controller Initialized");
     ROS_INFO("Kp: %f, Ki: %f, Kd: %f", servoKp, servoKi, servoKd);
@@ -96,45 +100,43 @@ void VrsFailsafeController::PubThrust(float thrust)
 void VrsFailsafeController::PubServo(float tilt)
 {
     // normalize tilt between -1 and 1 from -45 and 45
-    float tiltNorm = tilt/45;
+    float tiltNorm = -tilt/45;
     mavros_msgs::ActuatorControl servoMsg;
     servoMsg.header.stamp = ros::Time::now();
     servoMsg.group_mix = 0;
     servoMsg.controls[0] = tiltNorm;
     servoPub_.publish(servoMsg);
-    OutputPWM(tiltNorm);
     
-    std_msgs::Int32 tiltMsg;
-    tiltMsg.data = ConvertTiltToPWM(tiltNorm);
-    servo1Pub.publish(tiltMsg);
-    servo2Pub.publish(tiltMsg);
+    // publish to the servo node
+    std_msgs::Int32 tiltMsg1;
+    tiltMsg1.data = ConvertTiltToPWM(tiltNorm, servo1Min_, servo1Max_);
+    servo1Pub.publish(tiltMsg1);
+    std_msgs::Int32 tiltMsg2;
+    tiltMsg2.data = ConvertTiltToPWM(tiltNorm, servo2Min_, servo2Max_);
+    servo2Pub.publish(tiltMsg2);
 }
 
-int VrsFailsafeController::ConvertTiltToPWM(float tilt)
+int VrsFailsafeController::ConvertTiltToPWM(float tilt, float servoMin, float servoMax)
 {
     // Ensure the input is within the range of -1 to +1
     tilt = std::max(-1.0f, std::min(1.0f, tilt));
 
-    // Scale the input to the PWM range
-    int pwmValue = static_cast<int>((tilt + 1.0f) / 2.0f * (MAX_PWM - MIN_PWM) + MIN_PWM);
+    // The neutral PWM value (0 tilt)
+    int neutralPWM = 1500;
+
+    // Calculate the range above and below the neutral PWM
+    float positiveRange = servoMax - neutralPWM;
+    float negativeRange = neutralPWM - servoMin;
+
+    // Map the tilt to the appropriate PWM value
+    int pwmValue;
+    if (tilt > 0) {
+        pwmValue = static_cast<int>(tilt * positiveRange + neutralPWM);
+    } else {
+        pwmValue = static_cast<int>(tilt * negativeRange + neutralPWM);
+    }
+
     return pwmValue;
-}
-
-void VrsFailsafeController::OutputPWM(float tilt) 
-{
-#ifdef __arm__
-    int pwmValue = ConvertTiltToPWM(tilt);
-
-    // Assuming you are using wiringPi library to output PWM to a specific GPIO pin
-    int pwmPin = 12;  // Example GPIO pin
-
-    // Set the PWM value to the pin
-    pwmWrite(pwmPin, pwmValue);
-
-    ROS_INFO("Input: %f, PWM: %d", tilt, pwmValue);
-#else
-
-#endif
 }
 
 void VrsFailsafeController::PubFreeFall()
