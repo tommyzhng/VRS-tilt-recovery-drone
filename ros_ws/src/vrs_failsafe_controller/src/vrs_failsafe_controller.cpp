@@ -168,7 +168,7 @@ void VrsFailsafeController::PubFreeFall()
     double elapsed_time = current_time - start_time;
 
     // Calculate the sine wave value
-    double tilt = -0.5 * (std::sin(2 * M_PI * frequency * elapsed_time + phase_shift) + 1);
+    double tilt = 22.5 * (std::sin(2 * M_PI * frequency * elapsed_time + phase_shift) -22.5);
     PubServo(tilt);
     ROS_INFO("%f", tilt);
 
