@@ -22,6 +22,7 @@
 #include <unsupported/Eigen/EulerAngles>
 #include <mavros_msgs/OverrideRCIn.h>
 #include <mavros_msgs/CommandLong.h>
+#include <std_msgs/Int32.h>
 
 // Wiring Pi
 #ifdef __arm__
@@ -83,7 +84,8 @@ private:
     ros::Publisher thrustPub_;
     ros::Publisher servoPub_;
     ros::Publisher stateMachineLoopbackPub_;
-    ros::Publisher servoPiPub;
+    ros::Publisher servo1Pub;
+    ros::Publisher servo2Pub;
     ros::ServiceClient servo_cmd_srv_;
 
     // subscriber data holders

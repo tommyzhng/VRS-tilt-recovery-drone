@@ -16,6 +16,8 @@ VrsFailsafeController::VrsFailsafeController(ros::NodeHandle& nh)
     positionSetpointPub_ = nh.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 1);
     thrustPub_ = nh.advertise<mavros_msgs::AttitudeTarget>("/mavros/setpoint_raw/attitude", 1);
     servoPub_ = nh.advertise<mavros_msgs::OverrideRCIn>("/mavross/actuator_control", 1);
+    servo1Pub = nh.advertise<std_msgs::Int32>("/rcio/tilt1", 1);
+    servo2Pub = nh.advertise<std_msgs::Int32>("/rcio/tilt2", 1);
 
     stateMachineLoopbackPub_ = nh.advertise<std_msgs::String>("/vrs_failsafe/state_machine_loopback", 1);
 
@@ -101,6 +103,11 @@ void VrsFailsafeController::PubServo(float tilt)
     servoMsg.controls[0] = tiltNorm;
     servoPub_.publish(servoMsg);
     OutputPWM(tiltNorm);
+    
+    std_msgs::Int32 tiltMsg;
+    tiltMsg.data = ConvertTiltToPWM(tiltNorm);
+    servo1Pub.publish(tiltMsg);
+    servo2Pub.publish(tiltMsg);
 }
 
 int VrsFailsafeController::ConvertTiltToPWM(float tilt)
