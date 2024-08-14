@@ -44,7 +44,7 @@ void VrsFailsafeController::CalculateTargetError()
 void VrsFailsafeController::ThrottleController()
 {
     // open loop control
-    if (curLocalVelocity_(2) <= -vh) {
+    if (curLocalVelocity_(2) <= - 0.28 * vh) {
         throttleSetpoint_ = 1.0;
         PubThrust(throttleSetpoint_);
         return;
@@ -79,7 +79,7 @@ void VrsFailsafeController::ServoController()
 {
     // initially set to 45 degree angle to disrupt the cyclic circulation
     // go back to 0 angle with criterion to get maximum thrust in the down direction
-    if (curLocalVelocity_(2) > -vh) {
+    if (curLocalVelocity_(2) > - 0.28*vh) {
         servoSetpoint_ = 0;
         PubServo(servoSetpoint_);
         return;
