@@ -35,6 +35,11 @@ void VrsFailsafeController::CalculateTargetError()
     errorAttitudeEuler_ = ToEulerAngles(q_err); 
     errorAttitudeEuler_ = errorAttitudeEuler_ * 180 / M_PI;
 
+    geometry_msgs::Vector3Stamped errorAttitudeEulerMsg;
+    errorAttitudeEulerMsg.vector.x = errorAttitudeEuler_(0);
+    errorAttitudeEulerMsg.vector.y = errorAttitudeEuler_(1);
+    errorAttitudeEulerMsg.vector.z = errorAttitudeEuler_(2);
+    attitudeErrorPub_.publish(errorAttitudeEulerMsg);
     // print the euler
     //ROS_INFO("Error: %f", errorAttitudeEuler_(1));
 }
@@ -108,16 +113,22 @@ void VrsFailsafeController::ServoController()
 void VrsFailsafeController::EstimateVRS()
 {   
     //ROS_INFO("Current State: %s", curState_.c_str());
+    
     CalculateTargetError();
-    // satisfy some critereons to change curState to vrsDetected
-    if (curLocalVelocity_(2) < -0.28 * vh) {  // Xin and Gao criterion
-        // print velocityt and 0.28 * vh
-        if ((sqrt(pow(curLocalVelocity_(0), 2) + pow(curLocalVelocity_(1), 2))/vh) < 0.7) {  // see if velocity magnitude is less than 0.7 m/s
-            if (errorAttitudeEuler_(0) > 5 || errorAttitudeEuler_(1) > 5 || errorAttitudeEuler_(2) > 5) {  // check if roll and pitch are within 5 degrees
-                curState_ = "vrsFailsafe";
-                //ROS_WARN("VRS Detected");
-            }
-        }
+    // comment out for testing; activate a regular 0 vel command at vh
+    if (curLocalVelocity_(2) < -vh) {
+        setpointDropVel_ = 0;
+        curState_ = "dropVelSetpoint";
     }
+    // // satisfy some critereons to change curState to vrsDetected
+    // if (curLocalVelocity_(2) < -0.28 * vh) {  // Xin and Gao criterion
+    //     // print velocityt and 0.28 * vh
+    //     if ((sqrt(pow(curLocalVelocity_(0), 2) + pow(curLocalVelocity_(1), 2))/vh) < 0.7) {  // see if velocity magnitude is less than 0.7 m/s
+    //         if (errorAttitudeEuler_(0) > 5 || errorAttitudeEuler_(1) > 5 || errorAttitudeEuler_(2) > 5) {  // check if roll and pitch are within 5 degrees
+    //             curState_ = "vrsFailsafe";
+    //             //ROS_WARN("VRS Detected");
+    //         }
+    //     }
+    // }
 
 }

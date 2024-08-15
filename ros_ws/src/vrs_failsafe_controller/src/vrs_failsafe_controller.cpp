@@ -18,6 +18,7 @@ VrsFailsafeController::VrsFailsafeController(ros::NodeHandle& nh)
     servoPub_ = nh.advertise<mavros_msgs::ActuatorControl>("/mavross/actuator_control", 1);
     servo1Pub = nh.advertise<std_msgs::Int32>("/rcio/tilt1", 1);
     servo2Pub = nh.advertise<std_msgs::Int32>("/rcio/tilt2", 1);
+    attitudeErrorPub_ = nh.advertise<geometry_msgs::Vector3Stamped>("/vrs_failsafe/attitude_error", 1);
 
     stateMachineLoopbackPub_ = nh.advertise<std_msgs::String>("/vrs_failsafe/state_machine_loopback", 1);
 
@@ -164,7 +165,7 @@ void VrsFailsafeController::PubDropVel(float vel)
     dropVelMsg.position.x = curLocalPosition_[0];
     dropVelMsg.position.y = curLocalPosition_[1];
     dropVelMsg.velocity.z = vel;
-    dropVelMsg.yaw = (90.0) * (M_PI /180.0);
+    dropVelMsg.yaw = (0) * (M_PI /180.0);
 
     positionSetpointPub_.publish(dropVelMsg);
 }
@@ -195,7 +196,7 @@ void VrsFailsafeController::PubStateMachineLoopback()
 
 void VrsFailsafeController::UpdateNode(void)
 {
-    //EstimateVRS();
+    EstimateVRS();
     PubStateMachineLoopback();
     if (curState_ == "vrsFailsafe") {
         ThrottleController();

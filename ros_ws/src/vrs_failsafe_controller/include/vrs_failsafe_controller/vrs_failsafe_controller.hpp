@@ -17,6 +17,7 @@
 #include <mavros_msgs/AttitudeTarget.h>
 #include <mavros_msgs/ActuatorControl.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Vector3Stamped.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <unsupported/Eigen/EulerAngles>
@@ -76,6 +77,7 @@ private:
     ros::Publisher servo1Pub;
     ros::Publisher servo2Pub;
     ros::ServiceClient servo_cmd_srv_;
+    ros::Publisher attitudeErrorPub_;
 
     // subscriber data holders
     Eigen::Vector3d curLocalPosition_{0, 0, 0};
