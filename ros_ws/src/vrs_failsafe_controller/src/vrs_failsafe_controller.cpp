@@ -75,7 +75,7 @@ void VrsFailsafeController::GUIDropVelCallback(const std_msgs::Float32::ConstPtr
 }
 void VrsFailsafeController::GUIServoSetpointCallback(const std_msgs::Float32::ConstPtr& msg)
 {
-    guiServoSetpoint_ = msg->data;
+    servoSetpoint_ = msg->data;
 }
 void VrsFailsafeController::GUIStateMachineCallback(const std_msgs::String::ConstPtr& msg)
 {
@@ -208,10 +208,8 @@ void VrsFailsafeController::UpdateNode(void)
         PubDropVel(setpointDropVel_);
     } else if (curState_ == "posSetpoint") {
         PubPositionSetpoint(setpointPosition_[0], setpointPosition_[1], setpointPosition_[2], setpointYaw_);
-        PubServo(guiServoSetpoint_);
-    } else {
-        return;
     }
+    PubServo(servoSetpoint_);
 }
     
     

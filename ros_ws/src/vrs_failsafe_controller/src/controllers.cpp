@@ -49,12 +49,12 @@ void VrsFailsafeController::CalculateTargetError()
 void VrsFailsafeController::ThrottleController()
 {
     // open loop control
-    if (curLocalVelocity_(2) <= - 0.28 * vh) {
-        throttleSetpoint_ = 1.0;
-        PubThrust(throttleSetpoint_);
-        return;
-    } 
-    ROS_INFO("Switched to closed loop control");
+    // if (curLocalVelocity_(2) <= - 0.28 * vh) {
+    //     throttleSetpoint_ = 1.0;
+    //     PubThrust(throttleSetpoint_);
+    //     return;
+    // } 
+    //ROS_INFO("Switched to closed loop control");
     // // closed loop control in acceleration with pid and tilt angle feedforward
     // p_velError_ = 0 - curLocalVelocity_(2);
     // i_velErrorSum_ += p_velError_;
@@ -74,7 +74,7 @@ void VrsFailsafeController::ThrottleController()
     // }
 
     setpointDropVel_ = 0;
-    curState_ = "dropVelSetpoint";
+    PubDropVel(setpointDropVel_);
 
     //PubThrust(throttleSetpoint_);
 }
@@ -86,16 +86,17 @@ void VrsFailsafeController::ServoController()
     // go back to 0 angle with criterion to get maximum thrust in the down direction
     if (curLocalVelocity_(2) > - 0.28*vh) {
         servoSetpoint_ = 0;
-        PubServo(servoSetpoint_);
         return;
-    } 
-    ROS_INFO("Servo: %f Throttle %f", servoSetpoint_, throttleSetpoint_);
-
-    if (curAccel_(2) < 9.81) { // check if vehicle is still accelerating downwards
-        servoSetpoint_ = 45;
-        PubServo(servoSetpoint_);
+    } else if (curAccel_(2) < 9.81) { // check if vehicle is still accelerating downwards
+        servoSetpoint_ = 30;
+        return;
+    } else if (curAccel_(2) > 9.81) { // if accelerating upwards, give less angle
+        servoSetpoint_ = 15;
         return;
     }
+
+    ROS_INFO("Servo: %f Throttle %f", servoSetpoint_, throttleSetpoint_);
+    return;
 
     // closed loop control for tilt 
     //auto velError = curLocalVelocity_(2) - 0;
@@ -117,8 +118,7 @@ void VrsFailsafeController::EstimateVRS()
     CalculateTargetError();
     // comment out for testing; activate a regular 0 vel command at vh
     if (curLocalPosition_(2) < 20 && curLocalVelocity_(2) < -4) {
-        setpointDropVel_ = 0;
-        curState_ = "dropVelSetpoint";
+        curState_ = "vrsFailsafe";
     }
     // // satisfy some critereons to change curState to vrsDetected
     // if (curLocalVelocity_(2) < -0.28 * vh) {  // Xin and Gao criterion
