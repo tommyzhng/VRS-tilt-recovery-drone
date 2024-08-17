@@ -116,7 +116,7 @@ void VrsFailsafeController::EstimateVRS()
     
     CalculateTargetError();
     // comment out for testing; activate a regular 0 vel command at vh
-    if (curLocalVelocity_(2) < -vh) {
+    if (curLocalPosition_(2) < 20 && curLocalVelocity_(2) < -4) {
         setpointDropVel_ = 0;
         curState_ = "dropVelSetpoint";
     }

@@ -147,9 +147,10 @@ void VrsFailsafeController::PubFreeFall()
     freefallMsg.header.stamp = ros::Time::now();
     freefallMsg.coordinate_frame = mavros_msgs::PositionTarget::FRAME_LOCAL_NED;
     // typemask ignores everything except for the position and accel z
-    freefallMsg.type_mask = mavros_msgs::PositionTarget::IGNORE_AFX | mavros_msgs::PositionTarget::IGNORE_AFY | mavros_msgs::PositionTarget::IGNORE_PZ | mavros_msgs::PositionTarget::IGNORE_VZ | mavros_msgs::PositionTarget::IGNORE_YAW | mavros_msgs::PositionTarget::IGNORE_YAW_RATE;
+    freefallMsg.type_mask = mavros_msgs::PositionTarget::IGNORE_AFX | mavros_msgs::PositionTarget::IGNORE_AFY | mavros_msgs::PositionTarget::IGNORE_PZ | mavros_msgs::PositionTarget::IGNORE_VZ | mavros_msgs::PositionTarget::IGNORE_YAW_RATE;
     freefallMsg.position.x = curLocalPosition_[0];
     freefallMsg.position.y = curLocalPosition_[1];
+    freefallMsg.yaw = (0) * (M_PI /180.0);
     // freefall
     freefallMsg.acceleration_or_force.z = -9.81;
     positionSetpointPub_.publish(freefallMsg);
