@@ -86,14 +86,11 @@ void VrsFailsafeController::ServoController()
     // go back to 0 angle with criterion to get maximum thrust in the down direction
     if (curLocalVelocity_(2) > - 0.28*vh) {
         servoSetpoint_ = 0;
-        return;
-    } else if (curAccel_(2) < 9.81) { // check if vehicle is still accelerating downwards
+    } else if (curLocalVelocity_(2) > -0.8*vh) {
+        servoSetpoint_ = 10;
+    } else if (curLocalVelocity_(2) < -vh) { // check if vehicle is still accelerating downwards
         servoSetpoint_ = 30;
-        return;
-    } else if (curAccel_(2) > 9.81) { // if accelerating upwards, give less angle
-        servoSetpoint_ = 15;
-        return;
-    }
+    } 
 
     ROS_INFO("Servo: %f Throttle %f", servoSetpoint_, throttleSetpoint_);
     return;
