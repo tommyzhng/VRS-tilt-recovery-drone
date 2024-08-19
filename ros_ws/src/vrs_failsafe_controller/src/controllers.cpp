@@ -84,7 +84,7 @@ void VrsFailsafeController::ServoController()
 {
     // initially set to 45 degree angle to disrupt the cyclic circulation
     // go back to 0 angle with criterion to get maximum thrust in the down direction
-    if (curLocalVelocity_(2) > - 0.28*vh) {
+    if (curLocalVelocity_(2) > -0.28*vh) {
         servoSetpoint_ = 0;
     } else if (curLocalVelocity_(2) > -0.8*vh) {
         servoSetpoint_ = 10;
@@ -104,7 +104,7 @@ void VrsFailsafeController::ServoController()
     //servoSetpoint_ = velError + stabilityOutput;
     servoSetpoint_ = std::max(20.0f, std::min(45.0f, throttleSetpoint_));        // clamp output
 
-    PubServo(servoSetpoint_);
+    //PubServo(servoSetpoint_);
     lastStabilityError_ = stabilityError;
 }
 

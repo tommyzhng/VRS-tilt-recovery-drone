@@ -118,9 +118,13 @@ private:
     double servoKi;
     double servoKd;
     
-    const float mass_ = 1.4;
+    const float mass_ = 1.5;
     const float propRadius = 0.0762; // 3 inch propeller
     const float vh = sqrt((mass_ * 9.81/4)/(2*1.225*(M_PI*pow(propRadius, 2))));  // m/s
+
+    // const float mass_ = 1.9;
+    // const float propRadius = 0.127; // 3 inch propeller
+    // const float vh = sqrt((mass_ * 9.81/4)/(2*1.225*(M_PI*pow(propRadius, 2))));  // m/s
 
     const float maxSafeVelocity = 0.28 * vh;    // m/s
 };
