@@ -2,7 +2,7 @@
 g = 9.81;
 
 %% drone variables
-m = 1;
+m = 1.9;
 R = 0.127;
 CDval = 0.008;
 CDDrone = 0.01;
