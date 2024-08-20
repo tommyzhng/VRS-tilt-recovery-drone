@@ -7,12 +7,14 @@ __pycache__/
 VRS_nonvectored/
 VRS_vectored/
 
-
 # for ROS
 build/
 devel/
 logs/
 .catkin_tools/
+
+# vscode
+.vscode/
 
 # MATLAB
 *.asv

@@ -4,3 +4,7 @@
 [submodule "ros_ws/src/pgd_rcio"]
 	path = ros_ws/src/pgd_rcio
 	url = https://github.com/seiga-k/pgd_rcio
+
+[submodule "matlab_ws/PX4-Toolbox-SITL-SFunction"]
+	path = matlab_ws/PX4-Toolbox-SITL-SFunction
+	url = https://github.com/tommyzhng/PX4-Toolbox-SITL-SFunction
