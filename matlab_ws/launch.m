@@ -2,23 +2,23 @@
 g = 9.81;
 
 %% drone variables
-m = 1;
+m = 1.9;
 R = 0.127;
 CDval = 0.008;
-CDDrone = 1.6e-7;
+CDDrone = 0.01;
 Arm = [
 0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2)) -0.2*(1/sqrt(2))
 0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) -0.2*(1/sqrt(2)) 0.2*(1/sqrt(2))
 0 0 0 0
 ];
-Ixx = 0.005; %Kgm^2
-Iyy = 0.005;
-Izz = 0.009;
+Ixx = 0.0126; %Kgm^2
+Iyy = 0.0126;
+Izz = 0.0253;
 
 inertia = diag([Ixx, Iyy, Izz]);
 
 rotorRPMMax = 10000;
-rotorTimeConst = 0.25;
+rotorTimeConst = 0.05;
 prop_inertia = (1/12) * 0.015 * 0.127^2;
 tilt_speed = [0; pi/4; 0];
 
@@ -63,7 +63,5 @@ ms_to_cms = 100;
 MAVLink_Input_Read_Size = 1024;
 
 % Sample Time of Plant and Controller (100 Hz)
-SampleTime = 0.01;
-
-
-open('rotor.slx')
+SampleTime = 0.004;
+%open('SILsim.slx')

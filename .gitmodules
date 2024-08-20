@@ -1,3 +1,7 @@
+[submodule "matlab_ws/PX4_Simulink-SIL_HIL-Toolbox"]
+	path = matlab_ws/PX4_Simulink-SIL_HIL-Toolbox
+	url = https://github.com/tommyzhng/PX4-Simulink-SIL_HIL-Toolbox
+
 [submodule "ros_ws/src/ros-qt-drone-app"]
     path = ros_ws/src/ros-qt-drone-app
     url = https://github.com/tommyzhng/ros-qt-drone-app.git
